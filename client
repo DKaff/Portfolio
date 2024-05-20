@@ -1,0 +1,44 @@
+// client.js
+document.addEventListener('DOMContentLoaded', () => {
+    const messageForm = document.getElementById('messageForm');
+    const messageInput = document.getElementById('messageInput');
+    const messageList = document.getElementById('messageList');
+
+    messageForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const message = messageInput.value;
+        messageInput.value = '';
+
+        try {
+            const response = await fetch('/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ message })
+            });
+            const data = await response.json();
+            appendMessage(data.message);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+
+    async function fetchMessages() {
+        try {
+            const response = await fetch('/messages');
+            const data = await response.json();
+            data.messages.forEach(message => appendMessage(message));
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    }
+
+    function appendMessage(message) {
+        const li = document.createElement('li');
+        li.textContent = message;
+        messageList.appendChild(li);
+    }
+
+    fetchMessages();
+});
